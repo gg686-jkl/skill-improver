@@ -1,0 +1,5 @@
+{
+  "docker-skill": "Generate production-ready Docker Compose files with healthchecks, restart policies, and volumes",
+  "debug-skill": "Diagnose and fix errors by analyzing stack traces, logs, and runtime behavior",
+  "refactor-skill": "Improve code structure without changing behavior, following best practices"
+}

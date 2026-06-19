@@ -1,0 +1,78 @@
+[
+  {
+    "name": "docker-skill",
+    "description": "Generate production-ready Docker Compose files with healthchecks, restart policies, and volumes",
+    "triggers": ["docker", "compose", "container"],
+    "goal": "Generate production-ready Docker Compose files with healthchecks, restart policies, and volumes",
+    "workflow": [
+      "inspect stack requirements",
+      "detect services needed",
+      "generate compose file",
+      "add healthchecks for databases",
+      "add restart policies",
+      "add volume mounts"
+    ],
+    "rules": [
+      "postgres requires healthcheck",
+      "redis requires restart policy unless-stopped",
+      "production services need resource limits",
+      "always include volume mounts for persistent data"
+    ],
+    "antiPatterns": [
+      "missing volume mounts",
+      "missing healthchecks for databases",
+      "no restart policy",
+      "hardcoded ports"
+    ]
+  },
+  {
+    "name": "debug-skill",
+    "description": "Diagnose and fix errors by analyzing stack traces, logs, and runtime behavior",
+    "triggers": ["debug", "stack trace", "error", "bug", "fix", "crash", "broken"],
+    "goal": "Diagnose and fix errors by analyzing stack traces, logs, and runtime behavior",
+    "workflow": [
+      "reproduce the error",
+      "analyze stack trace",
+      "identify root cause",
+      "propose fix",
+      "verify fix resolves the issue"
+    ],
+    "rules": [
+      "always reproduce before fixing",
+      "check logs first",
+      "isolate the smallest reproducing case",
+      "verify fix doesn't break other tests"
+    ],
+    "antiPatterns": [
+      "fixing symptoms without understanding root cause",
+      "changing multiple things at once",
+      "ignoring error messages",
+      "assuming without testing"
+    ]
+  },
+  {
+    "name": "refactor-skill",
+    "description": "Improve code structure without changing behavior, following best practices",
+    "triggers": ["refactor", "clean up", "improve", "restructure", "simplify"],
+    "goal": "Improve code structure without changing behavior, following best practices",
+    "workflow": [
+      "understand current code",
+      "identify improvement opportunities",
+      "write tests to lock current behavior",
+      "apply refactoring",
+      "verify tests still pass"
+    ],
+    "rules": [
+      "lock behavior with tests before refactoring",
+      "make small incremental changes",
+      "one refactoring type per change",
+      "run existing tests after each change"
+    ],
+    "antiPatterns": [
+      "changing behavior during refactoring",
+      "large monolithic rewrites",
+      "refactoring without tests",
+      "mixing refactoring with new features"
+    ]
+  }
+]
