@@ -1,0 +1,8 @@
+name: test-skill
+triggers:
+  - test
+  - example
+rules:
+  - respond to test queries
+antiPatterns: []
+examples: []

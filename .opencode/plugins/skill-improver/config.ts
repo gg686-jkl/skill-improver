@@ -90,7 +90,7 @@ export function loadSessionState(): PerSessionState {
  * Persists session state to `data/skill-improver-state.json`
  * (relative to plugin dir).
  */
+  export function saveSessionState(state: PerSessionState): void {
   const statePath = path.resolve(__dirname, "..", "..", "..", "data", "skill-improver-state.json");
-  const statePath = path.resolve(__dirname, "data", "skill-improver-state.json");
   writeJSON(statePath, state);
 }

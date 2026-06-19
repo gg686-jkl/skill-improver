@@ -1,0 +1,10 @@
+{
+  "skills": [
+    {
+      "id": "test",
+      "name": "Test Skill",
+      "triggers": ["test", "example"],
+      "path": "config/skills/test-skill.yaml"
+    }
+  ]
+}
