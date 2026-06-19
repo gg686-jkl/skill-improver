@@ -1,104 +1,233 @@
 import type { Plugin } from "@opencode-ai/plugin";
-import * as fs from "node:fs";
-import * as path from "node:path";
+import { isMonitored, getSessionState } from "./skill-improver/monitor.js";
+import { extractEpisode } from "./skill-improver/extractor.js";
+import { route, loadSkill } from "./skill-improver/router.js";
+import { evaluate } from "./skill-improver/evaluator.js";
+import { addObservation } from "./skill-improver/store.js";
+import { shouldConsolidate, consolidate } from "./skill-improver/consolidator.js";
+import { generateCandidate } from "./skill-improver/updater.js";
+import { evaluateRegression } from "./skill-improver/regression.js";
+import { loadSkillConfig } from "./skill-improver/config.js";
 
-const PROCESSED_FILE = "data/skill-improver-processed.json";
+// ============================================================================
+// Helpers
+// ============================================================================
 
-function loadProcessed(dir: string): Set<string> {
-  try {
-    const raw = fs.readFileSync(path.join(dir, PROCESSED_FILE), "utf-8");
-    return new Set(JSON.parse(raw));
-  } catch {
-    return new Set();
+/** Build monitored sessions list from skill config. */
+function buildMonitoredList(): Array<{ title: string; directory: string }> {
+  const config = loadSkillConfig();
+  const dir = process.cwd();
+  const list: Array<{ title: string; directory: string }> = [];
+
+  for (const skill of config.skills) {
+    list.push({ title: skill.name, directory: dir });
+    for (const trigger of skill.triggers) {
+      list.push({ title: trigger, directory: dir });
+    }
   }
+
+  return list;
 }
 
-function saveProcessed(dir: string, ids: Set<string>): void {
-  const p = path.join(dir, PROCESSED_FILE);
-  fs.mkdirSync(path.dirname(p), { recursive: true });
-  fs.writeFileSync(p, JSON.stringify([...ids]), "utf-8");
-}
+// ============================================================================
+// Plugin
+// ============================================================================
 
 export const SkillImprover: Plugin = async (ctx) => {
-  const { client, directory } = ctx;
-  const processed = loadProcessed(directory);
+  const { client } = ctx;
   const inFlight = new Set<string>();
+
+  /** Structured log via client.app.log(). */
+  const log = async (level: "info" | "warn" | "error", message: string): Promise<void> => {
+    await client.app.log({
+      body: { service: "skill-improver", level, message },
+    });
+  };
 
   return {
     event: async ({ event }) => {
+      // ── Trigger: session.idle only ────────────────────────────────────
+      if (event.type !== "session.idle") return;
+
+      const { sessionID } = event.properties as { sessionID: string };
+
+      // ── Guard: prevent concurrent processing of same session ─────────
+      if (inFlight.has(sessionID)) return;
+      inFlight.add(sessionID);
+
       try {
-        if (event.type !== "session.idle") return;
-        const { sessionID } = event.properties as { sessionID: string };
+        // ── Guard: skip analysis sessions ───────────────────────────────
+        const session = await client.session.get({
+          path: { id: sessionID },
+          query: { directory: ctx.directory },
+        });
+        const title = session.data?.title ?? "";
 
-        // Guard: prevent concurrent processing + idempotency (persistent)
-        if (processed.has(sessionID) || inFlight.has(sessionID)) return;
-        inFlight.add(sessionID);
+        if (title.startsWith("Skill Improver -")) {
+          await log("info", `[${sessionID}] Skipped: analysis session`);
+          return;
+        }
 
+        // ── Guard: check if session is monitored ───────────────────────
+        const monitoredList = buildMonitoredList();
+        if (!isMonitored(title, ctx.directory, monitoredList)) {
+          return;
+        }
+
+        await log("info", `[${sessionID}] Processing: "${title}"`);
+
+        // ── Step 1: Extract new messages (incremental) ──────────────────
+        let episode: ReturnType<typeof extractEpisode> extends infer R ? R : never;
         try {
-          // Guard: skip analysis sessions — check title
-          const session = await client.session.get({
-            path: { id: sessionID },
-            query: { directory },
-          });
-          if (session.data?.title?.startsWith("Skill Improver -")) return;
-
-          // 1. Fetch full conversation
           const msgs = await client.session.messages({
             path: { id: sessionID },
-            query: { directory },
+            query: { directory: ctx.directory },
           });
-          const conversation = formatConversation(msgs.data ?? []);
-          if (!conversation) return;
+          const state = getSessionState();
+          episode = extractEpisode(sessionID, msgs.data ?? [], state);
 
-          // 2. Create new session
-          const newSession = await client.session.create({
-            query: { directory },
-            body: { title: `Skill Improver - ${sessionID}` },
-          });
-          if (!newSession.data) return;
-
-          // 3. Inject context (noReply = background, no AI response)
-          await client.session.prompt({
-            path: { id: newSession.data.id },
-            query: { directory },
-            body: {
-              noReply: true,
-              parts: [{ type: "text", text: "分析以下对话，评估技能是否生效，提取可以改进的规则和反模式。对话内容如下：\n\n" + conversation }],
-            },
-          });
-
-          // Only mark processed after full pipeline succeeds
-          processed.add(sessionID);
-          saveProcessed(directory, processed);
-        } finally {
-          inFlight.delete(sessionID);
+          if (!episode) {
+            await log("info", `[${sessionID}] No new messages, skipping`);
+            return;
+          }
+          await log("info", `[${sessionID}] Extracted ${episode.messages.length} new messages`);
+        } catch (err) {
+          await log("error", `[${sessionID}] Extract failed: ${err}`);
+          return;
         }
+
+        // ── Step 2: Route to skill ──────────────────────────────────────
+        let skillId: string | null;
+        try {
+          skillId = route(episode);
+          if (!skillId) {
+            await log("info", `[${sessionID}] No matching skill found`);
+            return;
+          }
+          await log("info", `[${sessionID}] Matched skill: ${skillId}`);
+        } catch (err) {
+          await log("error", `[${sessionID}] Route failed: ${err}`);
+          return;
+        }
+
+        // ── Step 3: Load skill and evaluate ─────────────────────────────
+        let outcome: NonNullable<Awaited<ReturnType<typeof evaluate>>>;
+        try {
+          const skill = loadSkill(skillId);
+          if (!skill) {
+            await log("warn", `[${sessionID}] Skill "${skillId}" not found`);
+            return;
+          }
+
+          const goal = `Evaluate skill "${skill.name}" usage in session "${title}"`;
+          const result = await evaluate(episode, skill, goal);
+          if (!result) {
+            await log("warn", `[${sessionID}] Evaluation returned null`);
+            return;
+          }
+          outcome = result;
+          await log(
+            "info",
+            `[${sessionID}] Evaluation: success=${outcome.successScore.toFixed(2)} failure=${outcome.failureScore.toFixed(2)} novelty=${outcome.noveltyScore.toFixed(2)}`,
+          );
+        } catch (err) {
+          await log("error", `[${sessionID}] Evaluate failed: ${err}`);
+          return;
+        }
+
+        // ── Step 4: Store observation ───────────────────────────────────
+        try {
+          addObservation({
+            observationId: "",
+            skillId,
+            sessionId: sessionID,
+            episodeId: episode.episodeId,
+            failureScore: outcome.failureScore,
+            noveltyScore: outcome.noveltyScore,
+            summary: outcome.summary,
+            suggestedRule: outcome.suggestedRule,
+            timestamp: "",
+          });
+          await log("info", `[${sessionID}] Observation stored for skill "${skillId}"`);
+        } catch (err) {
+          await log("error", `[${sessionID}] Store failed: ${err}`);
+          return;
+        }
+
+        // ── Step 5: Check consolidation ─────────────────────────────────
+        try {
+          if (!shouldConsolidate(skillId)) {
+            await log("info", `[${sessionID}] Consolidation threshold not reached for "${skillId}"`);
+            return;
+          }
+          await log("info", `[${sessionID}] Consolidation triggered for "${skillId}"`);
+        } catch (err) {
+          await log("error", `[${sessionID}] shouldConsolidate failed: ${err}`);
+          return;
+        }
+
+        // ── Step 6: Consolidate observations ────────────────────────────
+        let consolidatedRules: string[];
+        try {
+          const rules = await consolidate(skillId);
+          if (!rules || rules.length === 0) {
+            await log("info", `[${sessionID}] Consolidation produced no rules for "${skillId}"`);
+            return;
+          }
+          consolidatedRules = rules;
+          await log("info", `[${sessionID}] Consolidated ${consolidatedRules.length} rules for "${skillId}"`);
+        } catch (err) {
+          await log("error", `[${sessionID}] Consolidate failed: ${err}`);
+          return;
+        }
+
+        // ── Step 7: Generate candidate ──────────────────────────────────
+        let candidate: NonNullable<Awaited<ReturnType<typeof generateCandidate>>>;
+        try {
+          const result = await generateCandidate(skillId, consolidatedRules);
+          if (!result) {
+            await log("warn", `[${sessionID}] Candidate generation returned null for "${skillId}"`);
+            return;
+          }
+          candidate = result;
+          await log("info", `[${sessionID}] Candidate generated: ${candidate.candidatePath}`);
+        } catch (err) {
+          await log("error", `[${sessionID}] generateCandidate failed: ${err}`);
+          return;
+        }
+
+        // ── Step 8: Regression evaluation ───────────────────────────────
+        try {
+          const regression = await evaluateRegression(skillId, candidate.candidatePath);
+          if (!regression) {
+            await log("warn", `[${sessionID}] Regression evaluation returned null for "${skillId}"`);
+            return;
+          }
+          await log(
+            "info",
+            `[${sessionID}] Regression: oldScore=${regression.oldScore.toFixed(2)} newScore=${regression.newScore.toFixed(2)} better=${regression.better}`,
+          );
+
+          if (regression.better) {
+            await log("info", `[${sessionID}] Candidate improves skill "${skillId}" — ready for review at ${candidate.candidatePath}`);
+          } else {
+            await log("info", `[${sessionID}] Candidate does NOT improve skill "${skillId}" — keeping current version`);
+          }
+        } catch (err) {
+          await log("error", `[${sessionID}] evaluateRegression failed: ${err}`);
+          return;
+        }
+
+        await log("info", `[${sessionID}] Pipeline complete for skill "${skillId}"`);
       } catch (err) {
-        await client.app.log({
-          body: { service: "skill-improver", level: "error", message: String(err) },
-        });
+        await log("error", `[${sessionID}] Unexpected error: ${err}`);
+      } finally {
+        inFlight.delete(sessionID);
       }
     },
-    dispose: async () => { processed.clear(); inFlight.clear(); },
+
+    dispose: async () => {
+      inFlight.clear();
+    },
   };
 };
-
-function formatConversation(messages: { info: { role: string }; parts: Array<{ type: string; text?: string; synthetic?: boolean; ignored?: boolean; tool?: string }> }[]): string {
-  if (!messages.length) return "";
-  return messages
-    .map((m) => {
-      const role = m.info.role;
-      const parts = m.parts ?? [];
-      const text = parts
-        .filter((p) => p.type === "text" && !p.synthetic && !p.ignored)
-        .map((p) => p.text ?? "")
-        .join("\n");
-      const tools = parts
-        .filter((p) => p.type === "tool")
-        .map((p) => `[tool: ${p.tool}]`)
-        .join(" ");
-      const content = text || tools || "[no content]";
-      return `[${role}]: ${content}`;
-    })
-    .join("\n\n");
-}
