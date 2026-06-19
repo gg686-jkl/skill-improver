@@ -1,13 +1,18 @@
 import type { Plugin } from "@opencode-ai/plugin";
+import { tool } from "@opencode-ai/plugin";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { isMonitored, getSessionState } from "./skill-improver/monitor.js";
 import { extractEpisode } from "./skill-improver/extractor.js";
 import { route, loadSkill } from "./skill-improver/router.js";
 import { evaluate } from "./skill-improver/evaluator.js";
-import { addObservation } from "./skill-improver/store.js";
+import { addObservation, clearObservations } from "./skill-improver/store.js";
 import { shouldConsolidate, consolidate } from "./skill-improver/consolidator.js";
 import { generateCandidate } from "./skill-improver/updater.js";
 import { evaluateRegression } from "./skill-improver/regression.js";
 import { loadSkillConfig } from "./skill-improver/config.js";
+import { readJSON, writeJSON } from "./skill-improver/storage.js";
+import type { Review } from "./skill-improver/types.js";
 
 // ============================================================================
 // Helpers
@@ -45,6 +50,69 @@ export const SkillImprover: Plugin = async (ctx) => {
   };
 
   return {
+    tool: {
+      skill_improver_approve: tool({
+        description: "Approve a skill improvement review. Replaces the old skill file with the candidate, clears observations, and updates review status.",
+        args: { reviewId: tool.schema.string() },
+        async execute(args) {
+          const { reviewId } = args;
+          const reviewPath = path.resolve(process.cwd(), "data", "reviews", `${reviewId}.json`);
+          const review = readJSON<Review>(reviewPath);
+
+          if (!review || !review.reviewId) {
+            return `Error: Review ${reviewId} not found`;
+          }
+
+          if (review.status !== "pending") {
+            return `Error: Review ${reviewId} is already ${review.status}`;
+          }
+
+          // Copy candidate to old skill path
+          if (fs.existsSync(review.candidatePath)) {
+            fs.copyFileSync(review.candidatePath, review.oldPath);
+            fs.unlinkSync(review.candidatePath);
+          }
+
+          // Clear observations for the skill
+          clearObservations(review.skillId);
+
+          // Update review status
+          review.status = "approved";
+          writeJSON(reviewPath, review);
+
+          return `Review ${reviewId} approved. Skill ${review.skillId} updated and observations cleared.`;
+        },
+      }),
+
+      skill_improver_reject: tool({
+        description: "Reject a skill improvement review. Deletes the candidate file and updates review status.",
+        args: { reviewId: tool.schema.string() },
+        async execute(args) {
+          const { reviewId } = args;
+          const reviewPath = path.resolve(process.cwd(), "data", "reviews", `${reviewId}.json`);
+          const review = readJSON<Review>(reviewPath);
+
+          if (!review || !review.reviewId) {
+            return `Error: Review ${reviewId} not found`;
+          }
+
+          if (review.status !== "pending") {
+            return `Error: Review ${reviewId} is already ${review.status}`;
+          }
+
+          // Delete candidate file
+          if (fs.existsSync(review.candidatePath)) {
+            fs.unlinkSync(review.candidatePath);
+          }
+
+          // Update review status
+          review.status = "rejected";
+          writeJSON(reviewPath, review);
+
+          return `Review ${reviewId} rejected. Candidate file deleted.`;
+        },
+      }),
+    },
     event: async ({ event }) => {
       // ── Trigger: session.idle only ────────────────────────────────────
       if (event.type !== "session.idle") return;
@@ -209,7 +277,33 @@ export const SkillImprover: Plugin = async (ctx) => {
           );
 
           if (regression.better) {
-            await log("info", `[${sessionID}] Candidate improves skill "${skillId}" — ready for review at ${candidate.candidatePath}`);
+            await log("info", `[${sessionID}] Candidate improves skill "${skillId}" — creating review session`);
+
+            // ── Step 9: Create review session ─────────────────────────
+            try {
+              const reviewSession = await client.session.create({
+                query: { directory: ctx.directory },
+                body: { title: `Skill Improver - Review ${skillId}` },
+              });
+              const sessionId = reviewSession.data?.id;
+              if (!sessionId) {
+                await log("error", `[${sessionID}] Review session creation returned no ID`);
+                return;
+              }
+              await client.session.prompt({
+                path: { id: sessionId },
+                query: { directory: ctx.directory },
+                body: {
+                  parts: [{
+                    type: "text",
+                    text: `You are reviewing a proposed skill improvement.\n\nReview ID: ${candidate.reviewId}\nSkill: ${skillId}\n\nSummary of changes:\n${candidate.diff}\n\nInstructions:\n1. Explain the change to the user\n2. Show the diff\n3. Ask user to reply \"approve\" or \"reject\"\n4. If user approves, call skill_improver_approve with reviewId=\"${candidate.reviewId}\"\n5. If user rejects, call skill_improver_reject with reviewId=\"${candidate.reviewId}\"\n6. Do NOT run git or edit files yourself`,
+                  }],
+                },
+              });
+              await log("info", `[${sessionID}] Review session created: ${sessionId}`);
+            } catch (err) {
+              await log("error", `[${sessionID}] Review session creation failed: ${err}`);
+            }
           } else {
             await log("info", `[${sessionID}] Candidate does NOT improve skill "${skillId}" — keeping current version`);
           }
