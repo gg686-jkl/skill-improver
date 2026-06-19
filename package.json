@@ -2,12 +2,8 @@
   "name": "skill-improver",
   "version": "0.1.0",
   "description": "OpenCode Skill Improver - automatic skill learning from sessions",
-  "main": "plugins/skill-improver/index.js",
-  "scripts": {
-    "build": "tsc",
-    "typecheck": "tsc --noEmit"
-  },
   "devDependencies": {
+    "@opencode-ai/plugin": "^1.17.8",
     "@types/node": "^26.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
