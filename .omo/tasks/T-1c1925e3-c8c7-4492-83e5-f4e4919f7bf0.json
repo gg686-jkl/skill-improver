@@ -1,0 +1,10 @@
+{
+  "id": "T-1c1925e3-c8c7-4492-83e5-f4e4919f7bf0",
+  "subject": "Create router.ts with route() and loadSkill() functions",
+  "description": "Implement keyword-based skill router in .opencode/plugins/skill-improver/router.ts",
+  "status": "in_progress",
+  "activeForm": "Creating router.ts",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11ee11976ffeXLWBcq3DLT3FD8"
+}

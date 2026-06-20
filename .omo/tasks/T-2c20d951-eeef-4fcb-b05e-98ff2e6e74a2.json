@@ -1,0 +1,10 @@
+{
+  "id": "T-2c20d951-eeef-4fcb-b05e-98ff2e6e74a2",
+  "subject": "Task 1: 类型定义 + 配置管理",
+  "description": "Create types.ts with all core types (Session, Episode, Observation, Outcome, Skill, SkillCandidate, Benchmark, Review) and config.ts for LLM/skill config management",
+  "status": "pending",
+  "activeForm": "Creating types and config modules",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_1206c521fffeUtubEec6JUl7z8"
+}

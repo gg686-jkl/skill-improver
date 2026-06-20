@@ -1,0 +1,10 @@
+{
+  "id": "T-cc71187c-a87c-48e6-95d5-ad1412bfaed3",
+  "subject": "Create llm.ts with callLLM and callLLMStructured",
+  "description": "Create the external LLM API client with OpenAI/Anthropic support, fallback, retry, and 30s timeout using node:https",
+  "status": "completed",
+  "activeForm": "Creating llm.ts",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11ee8ff6cffe3ABjJLTpidvqSg"
+}

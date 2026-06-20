@@ -1,0 +1,10 @@
+{
+  "id": "T-7042d79a-0d77-4ec2-8980-367f3724cea4",
+  "subject": "Create config files and clean up private information",
+  "description": "Create config/params.json, config/llm.json.example, clean config/llm.json, update .gitignore, update consolidator.ts to read from config/params.json, verify npx tsc --noEmit passes",
+  "status": "completed",
+  "activeForm": "Creating config files and cleaning up",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_119cc2cf8ffeAm7CRnxHGVF7kq"
+}

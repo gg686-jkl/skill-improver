@@ -1,0 +1,10 @@
+{
+  "id": "T-ca39c878-c21a-4457-95be-f21b4812dde9",
+  "subject": "Verify TypeScript compilation",
+  "description": "Run npx tsc --noEmit to verify no type errors",
+  "status": "pending",
+  "activeForm": "Verifying TypeScript compilation",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11ee11bf4ffe1qZ2AwykmkdCvi"
+}

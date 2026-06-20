@@ -1,0 +1,9 @@
+{
+  "id": "T-318c4311-0d88-422c-97dc-d55af6878e02",
+  "subject": "T4.3 Approve/reject flow test",
+  "description": "Create test candidate, test approve (file copy, git commit), test reject (candidate deletion)",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11c334c0affeFU3cBtYfGuJcdt"
+}

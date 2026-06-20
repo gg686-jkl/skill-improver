@@ -1,0 +1,265 @@
+{
+  "schema_version": 2,
+  "active_work_id": "skill-improver-refactor-df9aaab3",
+  "works": {
+    "skill-improver-mvp-91db0fb6": {
+      "work_id": "skill-improver-mvp-91db0fb6",
+      "active_plan": "C:\\Users\\XAMIN\\Desktop\\Skill Improver\\.omo\\plans\\skill-improver-mvp.md",
+      "plan_name": "skill-improver-mvp",
+      "status": "completed",
+      "started_at": "2026-06-19T11:18:11.583Z",
+      "updated_at": "2026-06-19T11:38:10.612Z",
+      "session_ids": [
+        "opencode:ses_1206c521fffeUtubEec6JUl7z8"
+      ],
+      "session_origins": {
+        "opencode:ses_1206c521fffeUtubEec6JUl7z8": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "Project scaffolding + configuration files",
+          "session_id": "opencode:ses_12063fbe7ffeo0q73gihrFaMzX",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "updated_at": "2026-06-19T11:25:23.148Z",
+          "started_at": "2026-06-19T11:21:08.478Z",
+          "status": "completed",
+          "ended_at": "2026-06-19T11:25:23.148Z",
+          "elapsed_ms": 254670
+        },
+        "todo:4": {
+          "task_key": "todo:4",
+          "task_label": "4",
+          "task_title": "Session monitor (hooks)",
+          "session_id": "opencode:ses_1205dc7a8ffe0FIvXeiUJAoT1R",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "updated_at": "2026-06-19T11:29:56.780Z",
+          "started_at": "2026-06-19T11:28:29.404Z",
+          "status": "completed",
+          "ended_at": "2026-06-19T11:29:56.780Z",
+          "elapsed_ms": 87376
+        },
+        "todo:7": {
+          "task_key": "todo:7",
+          "task_label": "7",
+          "task_title": "Plugin entry point + end-to-end wiring",
+          "session_id": "opencode:ses_1205a58f5ffew43c4H5EF2IKb6",
+          "agent": "Sisyphus-Junior",
+          "category": "quick",
+          "updated_at": "2026-06-19T11:33:58.028Z",
+          "started_at": "2026-06-19T11:33:39.588Z",
+          "status": "completed",
+          "ended_at": "2026-06-19T11:33:58.028Z",
+          "elapsed_ms": 18440
+        },
+        "final-wave:f1": {
+          "task_key": "final-wave:f1",
+          "task_label": "F1",
+          "task_title": "**Plan Compliance Audit** — `oracle`",
+          "session_id": "opencode:ses_120567391ffeCV6Yzr560Jf17F",
+          "agent": "oracle",
+          "updated_at": "2026-06-19T11:37:47.763Z",
+          "started_at": "2026-06-19T11:37:14.892Z",
+          "status": "completed",
+          "ended_at": "2026-06-19T11:37:47.763Z",
+          "elapsed_ms": 32871
+        }
+      },
+      "ended_at": "2026-06-19T11:38:10.612Z",
+      "elapsed_ms": 1199029
+    },
+    "skill-improver-refactor-df9aaab3": {
+      "work_id": "skill-improver-refactor-df9aaab3",
+      "active_plan": "C:\\Users\\XAMIN\\Desktop\\Skill Improver\\.omo\\plans\\skill-improver-refactor.md",
+      "plan_name": "skill-improver-refactor",
+      "status": "completed",
+      "started_at": "2026-06-19T18:12:35.714Z",
+      "updated_at": "2026-06-19T18:46:32.863Z",
+      "session_ids": [
+        "opencode:ses_1206c521fffeUtubEec6JUl7z8"
+      ],
+      "session_origins": {
+        "opencode:ses_1206c521fffeUtubEec6JUl7z8": "direct"
+      },
+      "agent": "atlas",
+      "task_sessions": {
+        "todo:1": {
+          "task_key": "todo:1",
+          "task_label": "1",
+          "task_title": "All config files exist: `config/llm.json`, `config/skills.json`, `config/skills/test-skill.yaml`",
+          "session_id": "opencode:ses_11ecf8ba3fferjwzydMRihntiw",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "started_at": "2026-06-19T18:15:35.229Z",
+          "ended_at": "2026-06-19T18:45:57.521Z",
+          "elapsed_ms": 1822292,
+          "status": "completed",
+          "updated_at": "2026-06-19T18:45:57.521Z"
+        },
+        "todo:4": {
+          "task_key": "todo:4",
+          "task_label": "4",
+          "task_title": "Session Monitor + Episode Extractor（增量处理）",
+          "session_id": "opencode:ses_11edf572fffejoyQzFhjgNXchC",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "started_at": "2026-06-19T18:23:25.188Z",
+          "status": "completed",
+          "updated_at": "2026-06-19T18:29:10.983Z",
+          "ended_at": "2026-06-19T18:29:10.983Z",
+          "elapsed_ms": 345795
+        },
+        "todo:8": {
+          "task_key": "todo:8",
+          "task_label": "8",
+          "task_title": "Consolidator（跨 session）",
+          "session_id": "opencode:ses_11edaba58ffeBlMQ776YgudyDQ",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-19T18:31:17.235Z",
+          "started_at": "2026-06-19T18:30:57.491Z",
+          "status": "completed",
+          "ended_at": "2026-06-19T18:31:17.235Z",
+          "elapsed_ms": 19744
+        },
+        "todo:9": {
+          "task_key": "todo:9",
+          "task_label": "9",
+          "task_title": "Skill Updater",
+          "session_id": "opencode:ses_11ed8ebaeffewGJ94I9unZMn0V",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-19T18:33:15.693Z",
+          "started_at": "2026-06-19T18:32:56.929Z",
+          "status": "completed",
+          "ended_at": "2026-06-19T18:33:15.693Z",
+          "elapsed_ms": 18764
+        },
+        "todo:10": {
+          "task_key": "todo:10",
+          "task_label": "10",
+          "task_title": "Regression Eval",
+          "session_id": "opencode:ses_11ed7269fffe32JGuRmxOi5iDY",
+          "agent": "Sisyphus-Junior",
+          "category": "unspecified-high",
+          "updated_at": "2026-06-19T18:35:00.980Z",
+          "started_at": "2026-06-19T18:34:42.805Z",
+          "status": "completed",
+          "ended_at": "2026-06-19T18:35:00.980Z",
+          "elapsed_ms": 18175
+        },
+        "final-wave:f1": {
+          "task_key": "final-wave:f1",
+          "task_label": "F1",
+          "task_title": "**Plan Compliance Audit** — `oracle`",
+          "session_id": "opencode:ses_11ecf8debffevLDFBZtoSWalku",
+          "agent": "oracle",
+          "updated_at": "2026-06-19T18:46:11.602Z",
+          "started_at": "2026-06-19T18:45:24.865Z",
+          "status": "completed",
+          "ended_at": "2026-06-19T18:46:11.602Z",
+          "elapsed_ms": 46737
+        }
+      },
+      "ended_at": "2026-06-19T18:46:32.863Z",
+      "elapsed_ms": 2037149
+    }
+  },
+  "active_plan": "C:\\Users\\XAMIN\\Desktop\\Skill Improver\\.omo\\plans\\skill-improver-refactor.md",
+  "started_at": "2026-06-19T18:12:35.714Z",
+  "status": "completed",
+  "updated_at": "2026-06-19T18:46:32.863Z",
+  "session_ids": [
+    "opencode:ses_1206c521fffeUtubEec6JUl7z8"
+  ],
+  "session_origins": {
+    "opencode:ses_1206c521fffeUtubEec6JUl7z8": "direct"
+  },
+  "plan_name": "skill-improver-refactor",
+  "task_sessions": {
+    "todo:1": {
+      "task_key": "todo:1",
+      "task_label": "1",
+      "task_title": "All config files exist: `config/llm.json`, `config/skills.json`, `config/skills/test-skill.yaml`",
+      "session_id": "opencode:ses_11ecf8ba3fferjwzydMRihntiw",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "started_at": "2026-06-19T18:15:35.229Z",
+      "ended_at": "2026-06-19T18:45:57.521Z",
+      "elapsed_ms": 1822292,
+      "status": "completed",
+      "updated_at": "2026-06-19T18:45:57.521Z"
+    },
+    "todo:4": {
+      "task_key": "todo:4",
+      "task_label": "4",
+      "task_title": "Session Monitor + Episode Extractor（增量处理）",
+      "session_id": "opencode:ses_11edf572fffejoyQzFhjgNXchC",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "started_at": "2026-06-19T18:23:25.188Z",
+      "status": "completed",
+      "updated_at": "2026-06-19T18:29:10.983Z",
+      "ended_at": "2026-06-19T18:29:10.983Z",
+      "elapsed_ms": 345795
+    },
+    "todo:8": {
+      "task_key": "todo:8",
+      "task_label": "8",
+      "task_title": "Consolidator（跨 session）",
+      "session_id": "opencode:ses_11edaba58ffeBlMQ776YgudyDQ",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-06-19T18:31:17.235Z",
+      "started_at": "2026-06-19T18:30:57.491Z",
+      "status": "completed",
+      "ended_at": "2026-06-19T18:31:17.235Z",
+      "elapsed_ms": 19744
+    },
+    "todo:9": {
+      "task_key": "todo:9",
+      "task_label": "9",
+      "task_title": "Skill Updater",
+      "session_id": "opencode:ses_11ed8ebaeffewGJ94I9unZMn0V",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-06-19T18:33:15.693Z",
+      "started_at": "2026-06-19T18:32:56.929Z",
+      "status": "completed",
+      "ended_at": "2026-06-19T18:33:15.693Z",
+      "elapsed_ms": 18764
+    },
+    "todo:10": {
+      "task_key": "todo:10",
+      "task_label": "10",
+      "task_title": "Regression Eval",
+      "session_id": "opencode:ses_11ed7269fffe32JGuRmxOi5iDY",
+      "agent": "Sisyphus-Junior",
+      "category": "unspecified-high",
+      "updated_at": "2026-06-19T18:35:00.980Z",
+      "started_at": "2026-06-19T18:34:42.805Z",
+      "status": "completed",
+      "ended_at": "2026-06-19T18:35:00.980Z",
+      "elapsed_ms": 18175
+    },
+    "final-wave:f1": {
+      "task_key": "final-wave:f1",
+      "task_label": "F1",
+      "task_title": "**Plan Compliance Audit** — `oracle`",
+      "session_id": "opencode:ses_11ecf8debffevLDFBZtoSWalku",
+      "agent": "oracle",
+      "updated_at": "2026-06-19T18:46:11.602Z",
+      "started_at": "2026-06-19T18:45:24.865Z",
+      "status": "completed",
+      "ended_at": "2026-06-19T18:46:11.602Z",
+      "elapsed_ms": 46737
+    }
+  },
+  "agent": "atlas",
+  "ended_at": "2026-06-19T18:46:32.863Z",
+  "elapsed_ms": 2037149
+}

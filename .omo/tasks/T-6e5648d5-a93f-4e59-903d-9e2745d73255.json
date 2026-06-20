@@ -1,0 +1,10 @@
+{
+  "id": "T-6e5648d5-a93f-4e59-903d-9e2745d73255",
+  "subject": "Create .opencode/plugins/skill-improver.ts with real OpenCode plugin API",
+  "description": "Rewrite the Skill Improver plugin entry point to use the real OpenCode plugin API. File at .opencode/plugins/skill-improver.ts using event hook, session state tracker, and evaluation pipeline on session.idle.",
+  "status": "completed",
+  "activeForm": "Creating skill-improver plugin",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_120265129ffeIwMhsbFvnyzq9t"
+}

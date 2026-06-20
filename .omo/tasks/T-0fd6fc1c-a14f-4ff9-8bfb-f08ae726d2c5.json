@@ -1,0 +1,10 @@
+{
+  "id": "T-0fd6fc1c-a14f-4ff9-8bfb-f08ae726d2c5",
+  "subject": "Rewrite skill-improver.ts plugin entry point",
+  "description": "Rewrite .opencode/plugins/skill-improver.ts with full pipeline: session.idle → monitor → extract → route → evaluate → store → consolidate → update → regression. All guards, incremental processing, error isolation per step.",
+  "status": "completed",
+  "activeForm": "Rewriting skill-improver plugin",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11ed5728affeRAHxlS00sSEA2R"
+}

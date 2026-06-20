@@ -1,0 +1,10 @@
+{
+  "id": "T-d9ea00cb-8d8f-4ed0-ab7c-2993636f9b6a",
+  "subject": "Task 3: LLM 客户端（可配置 + fallback）",
+  "description": "Create llm.ts with callLLM() supporting OpenAI/Anthropic API, fallback, structured output, timeout, retry",
+  "status": "pending",
+  "activeForm": "Creating LLM client",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_1206c521fffeUtubEec6JUl7z8"
+}

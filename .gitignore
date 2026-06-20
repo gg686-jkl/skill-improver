@@ -1,4 +1,9 @@
 data/*
+data/observations/
+data/candidates/
+data/reviews/
+data/monitored-sessions.json
 !data/.gitkeep
 node_modules/
 dist/
+config/llm.json

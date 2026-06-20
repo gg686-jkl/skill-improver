@@ -1,0 +1,10 @@
+{
+  "id": "T-f10d492e-e444-4ce3-89e0-1aa7180bdcd6",
+  "subject": "Verify TypeScript compilation and file existence",
+  "description": "Run npx tsc --noEmit and verify all files exist",
+  "status": "pending",
+  "activeForm": "Verifying TypeScript compilation",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11ee11976ffeXLWBcq3DLT3FD8"
+}

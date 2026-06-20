@@ -1,0 +1,10 @@
+{
+  "id": "T-d12925fe-ab99-4ec9-9df8-57dc2bb2241c",
+  "subject": "Create extractor.ts",
+  "description": "Create extractor.ts with extractNewMessages, formatMessages, extractEpisode functions",
+  "status": "pending",
+  "activeForm": "Creating extractor.ts",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11ee11bf4ffe1qZ2AwykmkdCvi"
+}

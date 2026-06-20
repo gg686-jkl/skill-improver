@@ -1,0 +1,9 @@
+{
+  "id": "T-1ebd98a4-e80f-4faa-a351-d83f2be4de35",
+  "subject": "T4.2 Manual integration test - full pipeline",
+  "description": "Start OpenCode, mark session for monitoring, trigger evaluation, check logs, verify pipeline runs end-to-end",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11c334c0affeFU3cBtYfGuJcdt"
+}

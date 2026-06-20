@@ -1,0 +1,10 @@
+{
+  "id": "T-042f4167-906b-4376-90ba-c56d5fccfab2",
+  "subject": "Phase 2: Rewrite router.ts",
+  "description": "Read OpenCode skill directories, use monitored-skills.json, return new Skill type",
+  "status": "completed",
+  "activeForm": "Rewriting router.ts",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11c334ca0ffeaM1d075eT69rYQ"
+}

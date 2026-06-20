@@ -1,5 +1,14 @@
 import { Observation } from "./types.js";
-import { readJSON, writeJSON } from "./storage.js";
+import { readJSON, writeJSON } from "./file-utils.js";
+
+
+function debugLog(msg: string): void {
+  try {
+    const fs = require("node:fs"); const path = require("node:path");
+    const p = path.resolve(process.cwd(), "data", "debug.log");
+    fs.appendFileSync(p, `[${new Date().toISOString()}] [STORE] ${msg}\n`, "utf-8");
+  } catch {}
+}
 
 /**
  * Get the file path for observations of a specific skill.
@@ -25,6 +34,7 @@ function generateObservationId(skillId: string): string {
  * - Deduplicates by sessionId + episodeId combination
  */
 export function addObservation(obs: Observation): void {
+  debugLog("Adding observation for skill: " + obs.skillId + ", session: " + obs.sessionId);
   const filePath = getObservationsPath(obs.skillId);
   const observations = readJSON<Observation[]>(filePath) ?? [];
 
@@ -45,9 +55,12 @@ export function addObservation(obs: Observation): void {
       existing.episodeId === obs.episodeId
   );
 
-  if (!isDuplicate) {
+  if (isDuplicate) {
+    debugLog("Duplicate observation skipped");
+  } else {
     observations.push(obs);
     writeJSON(filePath, observations);
+    debugLog("Observation saved");
   }
 }
 

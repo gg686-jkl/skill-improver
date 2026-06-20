@@ -1,0 +1,10 @@
+{
+  "id": "T-6f026b6e-a2ed-4198-87d2-d8760b164cee",
+  "subject": "Task 2: 文件存储层",
+  "description": "Create storage.ts with readJSON, writeJSON, readYAML, writeYAML functions with atomic writes and auto-created directories",
+  "status": "pending",
+  "activeForm": "Creating file storage layer",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_1206c521fffeUtubEec6JUl7z8"
+}

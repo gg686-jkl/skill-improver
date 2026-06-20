@@ -1,0 +1,9 @@
+{
+  "id": "T-f35eae78-0963-4fa8-9ce0-0e0102e5d554",
+  "subject": "T4.1 TypeScript check - run tsc --noEmit",
+  "description": "Run npx tsc --noEmit to verify no TypeScript errors in the project",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11c334c0affeFU3cBtYfGuJcdt"
+}

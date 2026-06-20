@@ -1,0 +1,10 @@
+{
+  "id": "T-22e628d1-f11a-4b35-9768-15b57515bf63",
+  "subject": "Create updater.ts for Skill Candidate Updater",
+  "description": "Create .opencode/plugins/skill-improver/updater.ts with generateCandidate() function that loads old skill, calls LLM, saves candidate YAML and review JSON",
+  "status": "completed",
+  "activeForm": "Creating updater.ts",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11ed8ebaeffewGJ94I9unZMn0V"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "T-48a1caf5-a318-4064-807e-2d52509c6a47",
+  "subject": "Create config files (skills.json, test-skill.yaml, llm.json)",
+  "description": "Create example configuration files at project root",
+  "status": "pending",
+  "activeForm": "Creating config files",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11ee11976ffeXLWBcq3DLT3FD8"
+}

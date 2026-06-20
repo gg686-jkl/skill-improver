@@ -1,0 +1,10 @@
+{
+  "id": "T-bc1b1c3b-f7ed-4959-9080-bc49ec025ddc",
+  "subject": "Create evaluator.ts for episode evaluation",
+  "description": "Create evaluator.ts in .opencode/plugins/skill-improver/ that exports evaluate() function calling external LLM to evaluate episodes against skills and goals. Must use callLLMStructured and return typed Outcome or null.",
+  "status": "pending",
+  "activeForm": "Creating evaluator.ts",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11ee11ad7ffeg53nJi6kbFwZmT"
+}

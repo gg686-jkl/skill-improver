@@ -1,0 +1,10 @@
+{
+  "id": "T-1a18ef8c-c3f5-4576-98dc-7e76408f346f",
+  "subject": "Create extractor.ts with incremental message extraction",
+  "description": "extractNewMessages, formatMessages, extractEpisode functions",
+  "status": "completed",
+  "activeForm": "Creating extractor.ts",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11edf572fffejoyQzFhjgNXchC"
+}

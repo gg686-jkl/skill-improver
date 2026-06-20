@@ -1,0 +1,10 @@
+{
+  "id": "T-fdeff38d-a1d0-43a0-80e0-7f37a436532d",
+  "subject": "Create store.ts for Observation persistence",
+  "description": "Create Observation Store with 5 exported functions: addObservation, listObservations, countObservations, countDistinctSessions, clearObservations",
+  "status": "in_progress",
+  "activeForm": "Creating Observation Store",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11ee1185affeJuukjXkOts2H7y"
+}

@@ -1,0 +1,10 @@
+{
+  "id": "T-8c1d0500-64a1-41ed-9ec3-0fb530eaa846",
+  "subject": "Code Quality Review",
+  "description": "Run type check, review for anti-patterns, AI slop, and code quality issues across all source files.",
+  "status": "completed",
+  "activeForm": "Running code quality review",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_1205671d4ffeRm54NLd3ragprt"
+}

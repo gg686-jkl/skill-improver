@@ -1,0 +1,10 @@
+{
+  "id": "T-0d0d5bfc-d486-4c3d-9e2a-0a8d64428ded",
+  "subject": "Create router.ts with route() and loadSkill()",
+  "description": "Create the keyword-based skill router with route() and loadSkill() functions",
+  "status": "completed",
+  "activeForm": "Creating router.ts",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_11edf55deffejt4XHzQSqojp1e"
+}

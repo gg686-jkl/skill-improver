@@ -2,21 +2,33 @@ import type { Plugin } from "@opencode-ai/plugin";
 import { tool } from "@opencode-ai/plugin";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { getSessionState } from "./skill-improver/monitor.js";
-import { extractEpisode } from "./skill-improver/extractor.js";
+import { getSessionState, extractEpisode } from "./skill-improver/session.js";
 import { route, loadSkill } from "./skill-improver/router.js";
 import { evaluate } from "./skill-improver/evaluator.js";
 import { addObservation, clearObservations } from "./skill-improver/store.js";
 import { shouldConsolidate, consolidate } from "./skill-improver/consolidator.js";
 import { generateCandidate } from "./skill-improver/updater.js";
 import { evaluateRegression } from "./skill-improver/regression.js";
-import { readJSON, writeJSON } from "./skill-improver/storage.js";
+import { commitSkillChange } from "./skill-improver/git.js";
+import { readJSON, writeJSON } from "./skill-improver/file-utils.js";
 import type { Review } from "./skill-improver/types.js";
 
 // ============================================================================
 // Helpers
 // ============================================================================
 
+// ── Debug log to file ───────────────────────────────────────────────
+
+const DEBUG_LOG = "data/debug.log";
+
+function debugLog(msg: string): void {
+  try {
+    const p = path.resolve(process.cwd(), DEBUG_LOG);
+    fs.mkdirSync(path.dirname(p), { recursive: true });
+    const ts = new Date().toISOString();
+    fs.appendFileSync(p, `[${ts}] ${msg}\n`, "utf-8");
+  } catch { /* ignore */ }
+}
 // ── Monitored sessions ─────────────────────────────────────────────────
 
 const MONITORED_FILE = "data/monitored-sessions.json";
@@ -82,7 +94,17 @@ export const SkillImprover: Plugin = async (ctx) => {
           review.status = "approved";
           writeJSON(reviewPath, review);
 
-          return `Review ${reviewId} approved. Skill ${review.skillId} updated and observations cleared.`;
+          // Git commit the change
+          const commitResult = commitSkillChange(
+            review.oldPath,
+            `skill-improver: update ${review.skillId} (${reviewId})`
+          );
+
+          if (commitResult.success) {
+            return `Review ${reviewId} approved. Skill ${review.skillId} updated, observations cleared, and changes committed to git.`;
+          } else {
+            return `Review ${reviewId} approved. Skill ${review.skillId} updated and observations cleared. Git commit failed: ${commitResult.error}`;
+          }
         },
       }),
 
@@ -189,6 +211,7 @@ export const SkillImprover: Plugin = async (ctx) => {
         }
 
         await log("info", `[${sessionID}] Processing: "${title}"`);
+        debugLog(`[${sessionID}] Monitored, processing "${title}"`);
 
         // ── Step 1: Extract new messages (incremental) ──────────────────
         let episode: ReturnType<typeof extractEpisode> extends infer R ? R : never;
@@ -205,6 +228,7 @@ export const SkillImprover: Plugin = async (ctx) => {
             return;
           }
           await log("info", `[${sessionID}] Extracted ${episode.messages.length} new messages`);
+          debugLog(`[${sessionID}] Extracted ${episode.messages.length} messages`);
         } catch (err) {
           await log("error", `[${sessionID}] Extract failed: ${err}`);
           return;
@@ -216,9 +240,11 @@ export const SkillImprover: Plugin = async (ctx) => {
           skillId = route(episode);
           if (!skillId) {
             await log("info", `[${sessionID}] No matching skill found`);
+            debugLog(`[${sessionID}] No matching skill found for messages: ${JSON.stringify(episode.messages.slice(0, 3))}`);
             return;
           }
           await log("info", `[${sessionID}] Matched skill: ${skillId}`);
+          debugLog(`[${sessionID}] Matched skill: ${skillId}`);
         } catch (err) {
           await log("error", `[${sessionID}] Route failed: ${err}`);
           return;
@@ -237,6 +263,7 @@ export const SkillImprover: Plugin = async (ctx) => {
           const result = await evaluate(episode, skill, goal);
           if (!result) {
             await log("warn", `[${sessionID}] Evaluation returned null`);
+            debugLog(`[${sessionID}] Evaluation returned null`);
             return;
           }
           outcome = result;
@@ -244,6 +271,7 @@ export const SkillImprover: Plugin = async (ctx) => {
             "info",
             `[${sessionID}] Evaluation: success=${outcome.successScore.toFixed(2)} failure=${outcome.failureScore.toFixed(2)} novelty=${outcome.noveltyScore.toFixed(2)}`,
           );
+          debugLog(`[${sessionID}] Evaluation: success=${outcome.successScore} failure=${outcome.failureScore}`);
         } catch (err) {
           await log("error", `[${sessionID}] Evaluate failed: ${err}`);
           return;
@@ -263,6 +291,7 @@ export const SkillImprover: Plugin = async (ctx) => {
             timestamp: "",
           });
           await log("info", `[${sessionID}] Observation stored for skill "${skillId}"`);
+          debugLog(`[${sessionID}] Observation stored for ${skillId}`);
         } catch (err) {
           await log("error", `[${sessionID}] Store failed: ${err}`);
           return;
@@ -311,51 +340,44 @@ export const SkillImprover: Plugin = async (ctx) => {
         }
 
         // ── Step 8: Regression evaluation ───────────────────────────────
+        let regressionResult = "unknown";
         try {
           const regression = await evaluateRegression(skillId, candidate.candidatePath);
-          if (!regression) {
-            await log("warn", `[${sessionID}] Regression evaluation returned null for "${skillId}"`);
-            return;
-          }
-          await log(
-            "info",
-            `[${sessionID}] Regression: oldScore=${regression.oldScore.toFixed(2)} newScore=${regression.newScore.toFixed(2)} better=${regression.better}`,
-          );
-
-          if (regression.better) {
-            await log("info", `[${sessionID}] Candidate improves skill "${skillId}" — creating review session`);
-
-            // ── Step 9: Create review session ─────────────────────────
-            try {
-              const reviewSession = await client.session.create({
-                query: { directory: ctx.directory },
-                body: { title: `Skill Improver - Review ${skillId}` },
-              });
-              const sessionId = reviewSession.data?.id;
-              if (!sessionId) {
-                await log("error", `[${sessionID}] Review session creation returned no ID`);
-                return;
-              }
-              await client.session.prompt({
-                path: { id: sessionId },
-                query: { directory: ctx.directory },
-                body: {
-                  parts: [{
-                    type: "text",
-                    text: `You are reviewing a proposed skill improvement.\n\nReview ID: ${candidate.reviewId}\nSkill: ${skillId}\n\nSummary of changes:\n${candidate.diff}\n\nInstructions:\n1. Explain the change to the user\n2. Show the diff\n3. Ask user to reply \"approve\" or \"reject\"\n4. If user approves, call skill_improver_approve with reviewId=\"${candidate.reviewId}\"\n5. If user rejects, call skill_improver_reject with reviewId=\"${candidate.reviewId}\"\n6. Do NOT run git or edit files yourself`,
-                  }],
-                },
-              });
-              await log("info", `[${sessionID}] Review session created: ${sessionId}`);
-            } catch (err) {
-              await log("error", `[${sessionID}] Review session creation failed: ${err}`);
-            }
-          } else {
-            await log("info", `[${sessionID}] Candidate does NOT improve skill "${skillId}" — keeping current version`);
+          if (regression) {
+            regressionResult = `oldScore=${regression.oldScore.toFixed(2)} newScore=${regression.newScore.toFixed(2)} better=${regression.better}`;
+            await log("info", `[${sessionID}] Regression: ${regressionResult}`);
           }
         } catch (err) {
-          await log("error", `[${sessionID}] evaluateRegression failed: ${err}`);
-          return;
+          await log("warn", `[${sessionID}] Regression failed: ${err}`);
+        }
+
+        // Always create review session (even if regression fails)
+        await log("info", `[${sessionID}] Creating review session for "${skillId}"`);
+
+        // ── Step 9: Create review session ─────────────────────────
+        try {
+          const reviewSession = await client.session.create({
+            query: { directory: ctx.directory },
+            body: { title: `Skill Improver - Review ${skillId}` },
+          });
+          const sessionId = reviewSession.data?.id;
+          if (!sessionId) {
+            await log("error", `[${sessionID}] Review session creation returned no ID`);
+            return;
+          }
+          await client.session.prompt({
+            path: { id: sessionId },
+            query: { directory: ctx.directory },
+            body: {
+              parts: [{
+                type: "text",
+                text: `You are reviewing a proposed skill improvement.\n\nReview ID: ${candidate.reviewId}\nSkill: ${skillId}\n\nSummary of changes:\n${candidate.diff}\n\nInstructions:\n1. Explain the change to the user\n2. Show the diff\n3. Ask user to reply "approve" or "reject"\n4. If user approves, call skill_improver_approve with reviewId="${candidate.reviewId}"\n5. If user rejects, call skill_improver_reject with reviewId="${candidate.reviewId}"\n6. Do NOT run git or edit files yourself`,
+              }],
+            },
+          });
+          await log("info", `[${sessionID}] Review session created: ${sessionId}`);
+        } catch (err) {
+          await log("error", `[${sessionID}] Review session creation failed: ${err}`);
         }
 
         await log("info", `[${sessionID}] Pipeline complete for skill "${skillId}"`);

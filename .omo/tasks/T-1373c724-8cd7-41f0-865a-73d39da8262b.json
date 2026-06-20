@@ -1,0 +1,9 @@
+{
+  "id": "T-1373c724-8cd7-41f0-865a-73d39da8262b",
+  "subject": "Add debug logging to regression evaluation",
+  "description": "Add debug logging lines to `.opencode/plugins/skill-improver/skill-improver.ts` around the regression result handling and review session creation/skip decision.",
+  "status": "completed",
+  "blocks": [],
+  "blockedBy": [],
+  "threadID": "ses_119ed7d11ffebyWaBZjjXJpOw9"
+}

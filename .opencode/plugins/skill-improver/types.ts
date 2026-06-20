@@ -51,11 +51,28 @@ export interface Observation {
 export interface Skill {
   id: string;
   name: string;
+  description?: string;
   path: string;
+  location?: "project" | "global" | "custom";
+  metadata?: Record<string, unknown>;
+  body?: string;
+  subSkills?: Skill[];
   triggers: string[];
   rules: string[];
   antiPatterns: string[];
   examples: string[];
+}
+
+export interface SkillFrontmatter {
+  name?: string;
+  description?: string;
+  homepage?: string;
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+export interface MonitoredSkillsConfig {
+  skills: string[];
 }
 
 /** A proposed modification to a skill file. */

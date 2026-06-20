@@ -1,0 +1,5 @@
+{
+  "consolidation_threshold": 5,
+  "min_novelty_score": 0.6,
+  "llm_timeout_ms": 30000
+}

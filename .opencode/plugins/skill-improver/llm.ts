@@ -4,15 +4,29 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { LLMConfig } from "./types.js";
 
+import { fileURLToPath } from "node:url";
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+
+function debugLog(msg: string): void {
+  try {
+    const fs = require("node:fs");
+    const path = require("node:path");
+    const p = path.resolve(process.cwd(), "data", "debug.log");
+    fs.appendFileSync(p, `[${new Date().toISOString()}] [LLM] ${msg}\n`, "utf-8");
+  } catch {}
+}
 // ── Config ──────────────────────────────────────────────────────────────────
 
 function loadConfig(): LLMConfig | null {
   try {
     const configPath = path.resolve(__dirname, "..", "..", "..", "config", "llm.json");
     const raw = fs.readFileSync(configPath, "utf-8");
+    debugLog(`Config loaded from: ${configPath}`);
     return JSON.parse(raw) as LLMConfig;
-  } catch {
+  } catch (e) {
+    debugLog(`Config load FAILED: ${e instanceof Error ? e.message : String(e)}`);
     return null;
   }
 }
@@ -227,6 +241,7 @@ async function callProvider(
   structured: boolean = false
 ): Promise<ProviderResult> {
   const url = getEndpoint(config);
+  debugLog(`Calling: ${url}`);
   const headers = getHeaders(config);
 
   let body: Record<string, unknown>;
@@ -244,6 +259,7 @@ async function callProvider(
 
   try {
     const result = await httpRequest(url, headers, body, 30_000);
+    debugLog(`Response: status=${result.status}, body=${result.body.substring(0, 200)}`);
 
     if (result.status >= 200 && result.status < 300) {
       const content =
@@ -270,7 +286,15 @@ async function callProvider(
 
 function getEndpoint(config: LLMConfig): string {
   if (config.baseUrl) {
-    return config.baseUrl.replace(/\/$/, "");
+    const base = config.baseUrl.replace(/\/$/, "");
+    // 如果 baseUrl 已经包含完整路径，直接返回
+    if (base.endsWith("/chat/completions") || base.endsWith("/messages")) {
+      return base;
+    }
+    // 否则根据 provider 添加端点
+    return config.provider === "anthropic"
+      ? `${base}/messages`
+      : `${base}/chat/completions`;
   }
   return config.provider === "openai"
     ? "https://api.openai.com/v1/chat/completions"
@@ -319,7 +343,11 @@ export async function callLLM(
   schema?: object
 ): Promise<unknown> {
   const config = loadConfig();
-  if (!config) return null;
+  debugLog(`callLLM config: ${JSON.stringify(config)}`);
+  if (!config) {
+    debugLog("callLLM: config is null");
+    return null;
+  }
 
   // Try primary provider (with 1 retry)
   const primary = await callWithRetry(config, prompt, schema, false);
