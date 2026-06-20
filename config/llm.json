@@ -1,10 +1,12 @@
 {
   "provider": "openai",
-  "model": "gpt-4o-mini",
-  "apiKey": "",
+  "model": "deepseek-v4-flash",
+  "apiKey": "sk-n7Fbk1PptvBvETyAOztrV1oPHwNxttXy",
+  "baseUrl": "https://token.sensenova.cn/v1",
   "fallback": {
-    "provider": "anthropic",
-    "model": "claude-sonnet-4-20250514",
-    "apiKey": ""
+    "provider": "openai",
+    "model": "deepseek-v4-flash",
+    "apiKey": "sk-n7Fbk1PptvBvETyAOztrV1oPHwNxttXy",
+    "baseUrl": "https://token.sensenova.cn/v1"
   }
 }
