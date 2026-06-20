@@ -4,9 +4,6 @@ import * as fs from "node:fs";
 import * as path from "node:path";
 import type { LLMConfig } from "./types.js";
 
-interface LLMConfigExtended extends LLMConfig {
-  baseUrl?: string;
-}
 
 // ── Config ──────────────────────────────────────────────────────────────────
 
@@ -224,7 +221,7 @@ interface ProviderResult {
 }
 
 async function callProvider(
-  config: LLMConfigExtended,
+  config: LLMConfig,
   prompt: string,
   schema?: object,
   structured: boolean = false
@@ -271,7 +268,7 @@ async function callProvider(
   }
 }
 
-function getEndpoint(config: LLMConfigExtended): string {
+function getEndpoint(config: LLMConfig): string {
   if (config.baseUrl) {
     return config.baseUrl.replace(/\/$/, "");
   }
@@ -280,7 +277,7 @@ function getEndpoint(config: LLMConfigExtended): string {
     : "https://api.anthropic.com/v1/messages";
 }
 
-function getHeaders(config: LLMConfigExtended): Record<string, string> {
+function getHeaders(config: LLMConfig): Record<string, string> {
   if (config.provider === "anthropic") {
     return {
       "x-api-key": config.apiKey,
@@ -295,7 +292,7 @@ function getHeaders(config: LLMConfigExtended): Record<string, string> {
 // ── Retry + fallback wrapper ────────────────────────────────────────────────
 
 async function callWithRetry(
-  config: LLMConfigExtended,
+  config: LLMConfig,
   prompt: string,
   schema?: object,
   structured: boolean = false

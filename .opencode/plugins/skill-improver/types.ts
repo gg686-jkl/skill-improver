@@ -94,6 +94,7 @@ export interface LLMConfig {
   provider: string;
   model: string;
   apiKey: string;
+  baseUrl?: string;
   fallback?: {
     provider: string;
     model: string;
