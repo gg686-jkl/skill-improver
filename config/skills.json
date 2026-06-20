@@ -5,12 +5,6 @@
       "name": "Test Skill",
       "triggers": ["test", "example"],
       "path": "config/skills/test-skill.yaml"
-    },
-    {
-      "id": "docker",
-      "name": "Docker Skill",
-      "triggers": ["docker", "compose", "container"],
-      "path": "config/skills/docker-skill.yaml"
     }
   ]
 }
