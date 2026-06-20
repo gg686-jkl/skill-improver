@@ -9,18 +9,29 @@ OpenCode plugin that automatically learns from sessions and improves Skill defin
 
 ## 🤖 Agent One-Click Setup
 
-Paste this prompt into OpenCode Agent to complete the full setup:
+Paste this prompt into OpenCode Agent. The agent will interactively guide you through the full setup:
 
 ```
-Please help me install and configure the Skill Improver plugin:
+Please help me interactively configure the Skill Improver plugin:
 
-1. Download the project from https://github.com/gg686-jkl/skill-improver
-2. Copy config/llm.json.example to config/llm.json and fill in my LLM API key
-3. Create config/monitored-skills.json with the skill names I want to monitor
-4. Verify config/params.json has reasonable defaults
-5. Create SKILL.md files under .opencode/skills/ for the skills I want to monitor
+1. First, ask me the following questions (use the ask/question tool):
+   - Which LLM provider? (openai / anthropic)
+   - What model name?
+   - What is the API key?
+   - Do you need a custom Base URL?
+   - Which OpenCode skills do you want to monitor? (skill names)
+   - Consolidation threshold? (default: 5, triggers after 5 distinct sessions)
+   - Minimum novelty score? (default: 0.6, observations below this are filtered out)
+
+2. Based on my answers:
+   - Download the project from https://github.com/gg686-jkl/skill-improver
+   - Create config/llm.json with my LLM configuration
+   - Create config/monitored-skills.json with my skill list
+   - Update config/params.json with my parameter preferences
+   - Verify all config files are correct
+
+3. Confirm everything is set up and ready to use
 ```
-
 ## Quick Start
 
 ```bash
