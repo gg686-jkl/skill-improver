@@ -1,6 +1,7 @@
 # Skill Improver
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[中文](README.md) | [English](README_EN.md)
+[![中文](https://img.shields.io/badge/语言-中文-red.svg)](README.md)
+[![English](https://img.shields.io/badge/Lang-English-blue.svg)](README_EN.md)
 
 OpenCode 插件，自动从会话中学习并改进 Skill。
 
@@ -32,13 +33,16 @@ Commit / Revert
 
 ## 🤖 Agent 一键配置
 
-将以下 prompt 发给 OpenCode，Agent 会自动完成配置：
+将以下 prompt 发给 OpenCode Agent，自动完成从下载到配置的全流程：
 
 ```
-请帮我配置 Skill Improver 插件：
-1. 复制 config/llm.json.example 为 config/llm.json，填入我的 LLM API key
-2. 创建 config/monitored-skills.json，列出我要监控的 skill
-3. 确认 config/params.json 参数合理
+请帮我安装配置 Skill Improver 插件：
+
+1. 从 https://github.com/gg686-jkl/skill-improver 下载项目到本地
+2. 复制 config/llm.json.example 为 config/llm.json，填入我的 LLM API key
+3. 创建 config/monitored-skills.json，列出我要监控的 skill 名称
+4. 确认 config/params.json 参数合理
+5. 在 .opencode/skills/ 下创建我要监控的 skill 的 SKILL.md
 ```
 
 ## 快速开始

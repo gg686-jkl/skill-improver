@@ -2,18 +2,23 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-[中文](README.md) | [English](README_EN.md)
+[![中文](https://img.shields.io/badge/语言-中文-red.svg)](README.md)
+[![English](https://img.shields.io/badge/Lang-English-blue.svg)](README_EN.md)
 
 OpenCode plugin that automatically learns from sessions and improves Skill definitions.
 
-## Agent One-Click Setup
+## 🤖 Agent One-Click Setup
 
-> Paste this prompt into your OpenCode agent to set up Skill Improver instantly:
+Paste this prompt into OpenCode Agent to complete the full setup:
 
 ```
-Clone https://github.com/user/skill-improver into ~/.opencode/plugins/skill-improver,
-copy config/llm.json.example to config/llm.json, fill in my API key,
-add my current skill to config/monitored-skills.json, and start watching this session.
+Please help me install and configure the Skill Improver plugin:
+
+1. Download the project from https://github.com/gg686-jkl/skill-improver
+2. Copy config/llm.json.example to config/llm.json and fill in my LLM API key
+3. Create config/monitored-skills.json with the skill names I want to monitor
+4. Verify config/params.json has reasonable defaults
+5. Create SKILL.md files under .opencode/skills/ for the skills I want to monitor
 ```
 
 ## Quick Start
