@@ -38,7 +38,9 @@ Commit / Revert
 ```
 请帮我交互式配置 Skill Improver 插件：
 
-1. 先问我以下问题（使用 ask 功能）：
+1. 先从 https://github.com/gg686-jkl/skill-improver 下载项目到本地
+
+2. 然后问我以下问题（使用 ask 功能）：
    - 使用哪个 LLM provider？（openai / anthropic）
    - 模型名称是什么？
    - API Key 是什么？
@@ -47,14 +49,13 @@ Commit / Revert
    - consolidation 阈值？（默认 5，即 5 个不同 session 后触发合并）
    - novelty 最低分数？（默认 0.6，低于此分数的观察会被过滤）
 
-2. 根据我的回答：
-   - 从 https://github.com/gg686-jkl/skill-improver 下载项目
-   - 创建 config/llm.json 并填入我的 LLM 配置
+3. 根据我的回答：
+   - 创建 config/llm.json 并填入 LLM 配置
    - 创建 config/monitored-skills.json 并填入 skill 列表
    - 更新 config/params.json 中的参数
    - 确认所有配置文件正确
 
-3. 最后告诉我配置完成，可以使用了
+4. 最后告诉我配置完成，可以使用了
 ```
 ## 快速开始
 
