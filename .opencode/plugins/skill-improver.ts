@@ -2,7 +2,7 @@ import type { Plugin } from "@opencode-ai/plugin";
 import { tool } from "@opencode-ai/plugin";
 import * as fs from "node:fs";
 import * as path from "node:path";
-import { isMonitored, getSessionState } from "./skill-improver/monitor.js";
+import { getSessionState } from "./skill-improver/monitor.js";
 import { extractEpisode } from "./skill-improver/extractor.js";
 import { route, loadSkill } from "./skill-improver/router.js";
 import { evaluate } from "./skill-improver/evaluator.js";
@@ -10,7 +10,6 @@ import { addObservation, clearObservations } from "./skill-improver/store.js";
 import { shouldConsolidate, consolidate } from "./skill-improver/consolidator.js";
 import { generateCandidate } from "./skill-improver/updater.js";
 import { evaluateRegression } from "./skill-improver/regression.js";
-import { loadSkillConfig } from "./skill-improver/config.js";
 import { readJSON, writeJSON } from "./skill-improver/storage.js";
 import type { Review } from "./skill-improver/types.js";
 
@@ -18,20 +17,23 @@ import type { Review } from "./skill-improver/types.js";
 // Helpers
 // ============================================================================
 
-/** Build monitored sessions list from skill config. */
-function buildMonitoredList(): Array<{ title: string; directory: string }> {
-  const config = loadSkillConfig();
-  const dir = process.cwd();
-  const list: Array<{ title: string; directory: string }> = [];
+// ── Monitored sessions ─────────────────────────────────────────────────
 
-  for (const skill of config.skills) {
-    list.push({ title: skill.name, directory: dir });
-    for (const trigger of skill.triggers) {
-      list.push({ title: trigger, directory: dir });
-    }
+const MONITORED_FILE = "data/monitored-sessions.json";
+
+function loadMonitored(): Set<string> {
+  try {
+    const raw = fs.readFileSync(path.resolve(process.cwd(), MONITORED_FILE), "utf-8");
+    return new Set(JSON.parse(raw));
+  } catch {
+    return new Set();
   }
+}
 
-  return list;
+function saveMonitored(ids: Set<string>): void {
+  const p = path.resolve(process.cwd(), MONITORED_FILE);
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  fs.writeFileSync(p, JSON.stringify([...ids]), "utf-8");
 }
 
 // ============================================================================
@@ -112,8 +114,52 @@ export const SkillImprover: Plugin = async (ctx) => {
           return `Review ${reviewId} rejected. Candidate file deleted.`;
         },
       }),
+
+      skill_improver_watch: tool({
+        description: "Mark the current session for monitoring by the skill improver plugin. The session will be evaluated after each AI response.",
+        args: {},
+        async execute() {
+          const state = loadMonitored();
+          const latestPath = path.resolve(process.cwd(), "data", "latest-session.txt");
+          try {
+            const sessionId = fs.readFileSync(latestPath, "utf-8").trim();
+            state.add(sessionId);
+            saveMonitored(state);
+            return `Session ${sessionId} is now being monitored. Say "stop monitoring" to disable.`;
+          } catch {
+            return "Error: No session found to monitor.";
+          }
+        },
+      }),
+
+      skill_improver_unwatch: tool({
+        description: "Stop monitoring the current session.",
+        args: {},
+        async execute() {
+          const state = loadMonitored();
+          const latestPath = path.resolve(process.cwd(), "data", "latest-session.txt");
+          try {
+            const sessionId = fs.readFileSync(latestPath, "utf-8").trim();
+            state.delete(sessionId);
+            saveMonitored(state);
+            return `Session ${sessionId} is no longer monitored.`;
+          } catch {
+            return "Error: No session found.";
+          }
+        },
+      }),
     },
     event: async ({ event }) => {
+      if (event.type === "session.created") {
+        const info = (event.properties as any).info;
+        if (info?.id) {
+          const p = path.resolve(process.cwd(), "data", "latest-session.txt");
+          fs.mkdirSync(path.dirname(p), { recursive: true });
+          fs.writeFileSync(p, info.id, "utf-8");
+        }
+        return;
+      }
+
       // ── Trigger: session.idle only ────────────────────────────────────
       if (event.type !== "session.idle") return;
 
@@ -137,8 +183,8 @@ export const SkillImprover: Plugin = async (ctx) => {
         }
 
         // ── Guard: check if session is monitored ───────────────────────
-        const monitoredList = buildMonitoredList();
-        if (!isMonitored(title, ctx.directory, monitoredList)) {
+        const monitored = loadMonitored();
+        if (!monitored.has(sessionID)) {
           return;
         }
 
