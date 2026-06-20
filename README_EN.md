@@ -16,14 +16,15 @@ Please help me interactively configure the Skill Improver plugin:
 
 1. First, download the project from https://github.com/gg686-jkl/skill-improver
 
-2. Then ask me the following questions (use the ask/question tool):
-   - Which LLM provider? (openai / anthropic)
-   - What model name?
-   - What is the API key?
-   - Do you need a custom Base URL?
-   - Which OpenCode skills do you want to monitor? (skill names)
-   - Consolidation threshold? (default: 5, triggers after 5 distinct sessions)
-   - Minimum novelty score? (default: 0.6, observations below this are filtered out)
+2. Then ask me the following questions (use the ask/question tool, explain each parameter):
+
+   - Which LLM provider? (e.g., openai / anthropic. Choose openai for OpenAI-compatible APIs)
+   - What model name? (e.g., gpt-4o-mini / deepseek-v4-flash / claude-sonnet-4-20250514)
+   - What is the API key? (used to call the LLM for evaluating conversation quality)
+   - Do you need a custom Base URL? (defaults to official endpoint. Use this for proxies or third-party APIs)
+   - Which OpenCode skills do you want to monitor? (skill names, e.g., ima-skill, docker-skill)
+   - Consolidation threshold? (default: 5. After collecting observations from 5 distinct sessions, triggers consolidation and generates improvement suggestions)
+   - Minimum novelty score? (default: 0.6, range 0-1. Only observations with novelty above this value are accepted, filtering out low-quality suggestions)
 
 3. Based on my answers:
    - Create config/llm.json with LLM configuration

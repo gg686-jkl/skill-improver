@@ -40,14 +40,15 @@ Commit / Revert
 
 1. 先从 https://github.com/gg686-jkl/skill-improver 下载项目到本地
 
-2. 然后问我以下问题（使用 ask 功能）：
-   - 使用哪个 LLM provider？（openai / anthropic）
-   - 模型名称是什么？
-   - API Key 是什么？
-   - 是否需要自定义 Base URL？
-   - 需要监控哪些 OpenCode skill？（skill 名称列表）
-   - consolidation 阈值？（默认 5，即 5 个不同 session 后触发合并）
-   - novelty 最低分数？（默认 0.6，低于此分数的观察会被过滤）
+2. 然后问我以下问题（使用 ask 功能，每个问题都要解释参数含义）：
+
+   - 使用哪个 LLM provider？（如 openai / anthropic。如果是 OpenAI 兼容的 API，选 openai）
+   - 模型名称是什么？（如 gpt-4o-mini / deepseek-v4-flash / claude-sonnet-4-20250514）
+   - API Key 是什么？（用于调用 LLM 评估对话质量）
+   - 是否需要自定义 Base URL？（默认用官方地址。如果用代理或第三方 API，填这里）
+   - 需要监控哪些 OpenCode skill？（skill 名称列表，如 ima-skill、docker-skill）
+   - consolidation 阈值？（默认 5。即收集到 5 个不同 session 的观察后，触发合并并生成改进建议）
+   - novelty 最低分数？（默认 0.6，范围 0-1。只有新颖度高于此值的观察才会被采用，避免低质量建议）
 
 3. 根据我的回答：
    - 创建 config/llm.json 并填入 LLM 配置
