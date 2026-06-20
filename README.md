@@ -1,6 +1,6 @@
 # Skill Improver
 
-OpenCode 插件，自动从会话中学习并改进 Skill 定义。
+OpenCode 插件，自动从会话中学习并改进 Skill 。
 
 ## 架构
 
